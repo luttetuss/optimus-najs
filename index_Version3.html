@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ABDI OS | OPTIMUS NAJS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Permanent+Marker&display=swap');
+        
+        body { 
+            background: #000; color: #fff; font-family: 'Orbitron', sans-serif; 
+            height: 100vh; overflow: hidden; margin: 0;
+        }
+
+        .cyber-panel {
+            background: rgba(10, 10, 10, 0.8);
+            border-left: 4px solid #ff003c;
+            box-shadow: -10px 0 20px rgba(255, 0, 60, 0.2);
+        }
+
+        .lambo-glow {
+            box-shadow: 0 0 40px rgba(255, 170, 0, 0.3);
+            border: 1px solid #ffaa00;
+        }
+
+        .abdi-bubble { 
+            font-family: 'Permanent Marker', cursive; 
+            background: white; color: black;
+            border-radius: 20px 20px 20px 0;
+        }
+
+        /* Puls för Lambo-läget */
+        .engine-active { animation: shake 0.05s infinite; filter: hue-rotate(90deg); }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 100% { transform: translate(-1px, -1px); } }
+
+        #lambo-pedal {
+            background: linear-gradient(180deg, #333 0%, #111 100%);
+            border-radius: 10px 10px 40px 40px;
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between">
+
+    <!-- BOOT SYSTEM -->
+    <div id="boot" class="fixed inset-0 z-[300] bg-black flex flex-col items-center justify-center">
+        <div class="text-center animate-pulse">
+            <h1 class="text-4xl font-black italic tracking-tighter">ABDI_CYBER_V6</h1>
+            <p class="text-red-600 tracking-[0.5em] text-[10px] mt-2">CALIBRATING SARCASTIC ENGINE...</p>
+        </div>
+        <button onclick="app.ignite()" class="mt-12 px-10 py-5 border-2 border-white font-bold hover:bg-white hover:text-black transition-all">
+            VÄLKOMMEN OPTIMUS NAJS
+        </button>
+    </div>
+
+    <!-- HUD TOP -->
+    <header class="p-6 flex justify-between items-start pt-12">
+        <div class="cyber-panel p-3">
+            <p class="text-[8px] text-gray-500">SYSTEM_STATUS</p>
+            <p class="text-green-500 text-xs">GANGSTA_READY</p>
+        </div>
+        <div class="text-right">
+            <h2 class="text-2xl font-black italic text-white">OPTIMUS NAJS</h2>
+            <p id="clock" class="text-cyan-500 text-xs">00:00:00</p>
+        </div>
+    </header>
+
+    <!-- ABDI CENTER -->
+    <div class="flex flex-col items-center px-10 relative">
+        <div id="avatar-frame" class="w-64 h-64 rounded-2xl border-2 border-zinc-800 overflow-hidden bg-zinc-950 relative">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Abdi&backgroundColor=000000&top=shortHair&accessories=eyepatch&facialHair=magnum" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-red-600/20 to-transparent"></div>
+        </div>
+        
+        <div id="speech" class="absolute -top-10 scale-0 transition-all duration-300">
+            <div class="abdi-bubble p-4 shadow-xl">
+                <p id="abdi-text" class="text-sm font-bold"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAMBO CONTROLS -->
+    <div class="px-6 space-y-4">
+        <div class="flex justify-between items-end mb-2">
+            <span class="text-[10px] text-orange-500 font-bold">V12 ENGINE SIMULATOR</span>
+            <span id="rpm" class="text-2xl font-black italic text-orange-500">0 RPM</span>
+        </div>
+        <button id="lambo-pedal" 
+                onmousedown="app.gas(true)" 
+                onmouseup="app.gas(false)" 
+                ontouchstart="app.gas(true)" 
+                ontouchend="app.gas(false)"
+                class="w-full h-24 lambo-glow flex items-center justify-center font-black italic text-xl">
+            GASAAAA, BROR!
+        </button>
+    </div>
+
+    <!-- FOOTER MENU -->
+    <footer class="p-6 grid grid-cols-2 gap-3 pb-12">
+        <button onclick="app.sarcasm()" class="cyber-panel p-4 text-[10px] font-bold text-left uppercase">
+            Grilla min körning
+        </button>
+        <button onclick="app.arnold()" class="cyber-panel p-4 text-[10px] font-bold text-left uppercase border-blue-500">
+            Terminator Mode
+        </button>
+    </footer>
+
+    <!-- AUDIO -->
+    <audio id="lambo-sound" loop src="https://www.soundjay.com/mechanical/sounds/car-accelerating-1.mp3"></audio>
+    <audio id="ice-cube" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
+
+    <script>
+        class AbdiApp {
+            constructor() {
+                this.isGas = false;
+                this.lambo = document.getElementById('lambo-sound');
+                this.ice = document.getElementById('ice-cube');
+            }
+
+            ignite() {
+                gsap.to("#boot", { y: "-100%", duration: 1, ease: "expo.inOut" });
+                this.ice.volume = 0.2;
+                this.ice.play();
+                this.updateClock();
+                setTimeout(() => this.welcome(), 1000);
+            }
+
+            welcome() {
+                const txt = "Valla OptimusNajs! Jag ser att du har tvättat bilen... eller vänta, är det där smuts? Jag skojar bror, du är ett geni. Men kom ihåg: Om polisen stoppar oss, du känner inte mig, jag är bara en GPS. Nu kör vi innan jag somnar!";
+                this.speak(txt, 0.7, 0.9);
+            }
+
+            gas(active) {
+                this.isGas = active;
+                const frame = document.getElementById('avatar-frame');
+                const rpmTxt = document.getElementById('rpm');
+                
+                if(active) {
+                    this.lambo.play();
+                    this.lambo.playbackRate = 1.5;
+                    frame.classList.add('engine-active');
+                    rpmTxt.innerText = "9000 RPM";
+                    if(Math.random() > 0.8) this.speak("Lugna dig Optimus! Vi är i Malmö, inte på Formel 1!", 1.2, 1.5);
+                } else {
+                    this.lambo.pause();
+                    frame.classList.remove('engine-active');
+                    rpmTxt.innerText = "0 RPM";
+                }
+            }
+
+            speak(text, p, r) {
+                window.speechSynthesis.cancel();
+                const m = new SpeechSynthesisUtterance(text);
+                m.lang = 'sv-SE';
+                m.pitch = p;
+                m.rate = r;
+                
+                m.onstart = () => {
+                    document.getElementById('abdi-text').innerText = text;
+                    document.getElementById('speech').style.transform = "scale(1)";
+                };
+                m.onend = () => {
+                    setTimeout(() => {
+                        document.getElementById('speech').style.transform = "scale(0)";
+                    }, 3000);
+                };
+                window.speechSynthesis.speak(m);
+            }
+
+            sarcasm() {
+                const q = ["Du kör som en kratta, valla!", "Bromsa inte nu, det är bara en tant som går över vägen!", "Snygg parkering... sa ingen någonsin.", "OptimusNajs? Mer som Optimus-Snigel!"];
+                this.speak(q[Math.floor(Math.random()*q.length)], 0.9, 1.1);
+            }
+
+            arnold() {
+                this.speak("Get in the car! I need your kebab and your motorcycle! Hasta la vista, pajas!", 0.3, 0.7);
+            }
+
+            updateClock() {
+                setInterval(() => {
+                    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+                }, 1000);
+            }
+        }
+
+        const app = new AbdiApp();
+    </script>
+</body>
+</html>
